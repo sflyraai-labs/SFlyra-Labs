@@ -53,9 +53,14 @@ ALLOWED_ORIGINS = os.getenv(
     "http://localhost:8080,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8080",
 ).split(",")
 
+# Allow any *.vercel.app origin so the deployed site can call the hosted backend
+# without configuring CORS manually. Tighten via the CORS_ORIGINS env var.
+_VERCEL_APP_REGEX = r"https://[a-zA-Z0-9-]+\.vercel\.app"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in ALLOWED_ORIGINS if o.strip()],
+    allow_origin_regex=_VERCEL_APP_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

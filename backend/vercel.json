@@ -1,0 +1,16 @@
+{
+  "framework": null,
+  "functions": {
+    "main.py": {
+      "runtime": "@vercel/python",
+      "includeFiles": "main.py, sflyra_agents.py, requirements.txt",
+      "excludeFiles": ".venv/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/main"
+    }
+  ]
+}
