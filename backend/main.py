@@ -72,6 +72,25 @@ app.add_middleware(
 
 
 # ---------------------------------------------------------------------------
+# Root
+# ---------------------------------------------------------------------------
+@app.get("/")
+async def index() -> dict:
+    """Friendly landing response so the root URL isn't a bare 404."""
+
+    return {
+        "service": "SFlyra AI Agents API",
+        "version": app.version,
+        "endpoints": {
+            "health": "/api/health",
+            "agents": "/api/agents",
+            "chat": "/api/chat",
+            "docs": "/docs",
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
 class ChatMessage(BaseModel):
