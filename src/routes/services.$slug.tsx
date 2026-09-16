@@ -2,6 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
 
 import {
+  ChatActionLink,
   GhostButton,
   PageBar,
   PrimaryButton,
@@ -91,7 +92,7 @@ function ServicePage() {
 
           {/* Live agent chat */}
           <Reveal delay={0.1}>
-            <div>
+            <div id="agent-chat" className="scroll-mt-24">
               <p className="mb-3 flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-primary uppercase">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_currentColor]" />
                 Live agent chat
@@ -144,8 +145,14 @@ function ServicePage() {
               const RI = r.icon;
               return (
                 <Reveal key={r.slug} delay={(i % 4) * 0.06}>
-                  <Link to="/services/$slug" params={{ slug: r.slug }} className="block h-full">
-                    <SpotlightCard className="glass-panel flex h-full flex-col gap-4 p-6 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">
+                  <SpotlightCard className="glass-panel flex h-full flex-col gap-4 p-6 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">
+                    <Link
+                      to="/services/$slug"
+                      params={{ slug: r.slug }}
+                      className="absolute inset-0 z-0"
+                      aria-label={`Open ${r.title}`}
+                    />
+                    <div className="pointer-events-none relative z-10 flex flex-1 flex-col gap-4">
                       <span className="grid h-11 w-11 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
                         <RI className="h-5 w-5" />
                       </span>
@@ -154,12 +161,19 @@ function ServicePage() {
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                           {r.desc}
                         </p>
-                        <p className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
-                          Open page <ArrowRight className="h-3.5 w-3.5" />
-                        </p>
+                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                          <Link
+                            to="/services/$slug"
+                            params={{ slug: r.slug }}
+                            className="pointer-events-auto inline-flex items-center gap-1.5 text-xs font-semibold text-primary transition-colors hover:text-highlight"
+                          >
+                            Open page <ArrowRight className="h-3.5 w-3.5" />
+                          </Link>
+                          <ChatActionLink to="/services/$slug" params={{ slug: r.slug }} />
+                        </div>
                       </div>
-                    </SpotlightCard>
-                  </Link>
+                    </div>
+                  </SpotlightCard>
                 </Reveal>
               );
             })}

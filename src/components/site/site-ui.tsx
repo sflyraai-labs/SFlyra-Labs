@@ -12,10 +12,12 @@ import {
   Smartphone,
   Sun,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 
 import logoPhoto from "@/assets/sflyra-logo.jpg";
 import type { DemoKind } from "@/lib/catalog";
+import { cn } from "@/lib/utils";
 
 export const NAV = [
   { label: "Services", href: "#services" },
@@ -220,6 +222,37 @@ export function SectionTitle({ eyebrow, title }: { eyebrow: string; title: strin
         {title}
       </h2>
     </div>
+  );
+}
+
+export function ChatActionLink({
+  to,
+  params,
+  label = "Chat with AI Agent",
+  className,
+}: {
+  to: string;
+  params: Record<string, string>;
+  label?: string;
+  className?: string;
+}) {
+  return (
+    <Link
+      to={to}
+      params={params}
+      hash="agent-chat"
+      className={cn(
+        "group/chat pointer-events-auto relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold",
+        "border border-primary/40 bg-primary/10 text-primary",
+        "shadow-[0_0_12px_rgba(0,240,255,0.18)] transition-all duration-300",
+        "hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_20px_rgba(0,240,255,0.55)]",
+        className,
+      )}
+    >
+      <Bot className="h-3.5 w-3.5 transition-transform duration-300 group-hover/chat:scale-110" />
+      {label}
+      <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/chat:translate-x-0.5" />
+    </Link>
   );
 }
 

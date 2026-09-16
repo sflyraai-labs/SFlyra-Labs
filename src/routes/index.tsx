@@ -22,6 +22,7 @@ import logoPhoto from "@/assets/sflyra-logo.jpg";
 import fatimahPhoto from "@/assets/fatimah.jpg";
 import sumiyaPhoto from "@/assets/sumi.jpg";
 import { Sparkles, SparkleBurst } from "@/components/site/Sparkles";
+import { ChatActionLink } from "@/components/site/site-ui";
 import { PRODUCTS, SERVICES } from "@/lib/catalog";
 import {
   Accordion,
@@ -539,22 +540,33 @@ function Index() {
           <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {SERVICES.map((s, i) => (
               <Reveal key={s.title} delay={(i % 3) * 0.08} className={serviceSpan(i)}>
-                <Link to="/services/$slug" params={{ slug: s.slug }} className="block h-full">
-                  <SpotlightCard className="glass-panel p-9 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong sm:p-10">
-                    <div className="absolute inset-0 bg-[image:var(--gradient-panel)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    <div className="relative">
-                      <span className="grid h-12 w-12 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
-                        <s.icon className="h-6 w-6" />
-                      </span>
-                      <h3 className="mt-7 font-display text-2xl font-semibold">{s.title}</h3>
-                      <p className="mt-3.5 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
-                      <p className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <SpotlightCard className="glass-panel h-full p-9 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong sm:p-10">
+                  <div className="absolute inset-0 bg-[image:var(--gradient-panel)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <Link
+                    to="/services/$slug"
+                    params={{ slug: s.slug }}
+                    className="absolute inset-0 z-0"
+                    aria-label={`Open ${s.title}`}
+                  />
+                  <div className="pointer-events-none relative z-10">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
+                      <s.icon className="h-6 w-6" />
+                    </span>
+                    <h3 className="mt-7 font-display text-2xl font-semibold">{s.title}</h3>
+                    <p className="mt-3.5 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+                    <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <Link
+                        to="/services/$slug"
+                        params={{ slug: s.slug }}
+                        className="pointer-events-auto inline-flex items-center gap-1.5 text-xs font-semibold text-primary transition-colors hover:text-highlight"
+                      >
                         Open page
                         <ArrowRight className="h-3.5 w-3.5" />
-                      </p>
+                      </Link>
+                      <ChatActionLink to="/services/$slug" params={{ slug: s.slug }} />
                     </div>
-                  </SpotlightCard>
-                </Link>
+                  </div>
+                </SpotlightCard>
               </Reveal>
             ))}
           </div>
@@ -596,29 +608,40 @@ function Index() {
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
               {PRODUCTS.map((p, i) => (
                 <Reveal key={p.title} delay={(i % 4) * 0.06}>
-                  <Link to="/products/$slug" params={{ slug: p.slug }} className="block h-full">
-                    <SpotlightCard className="glass-panel flex h-full flex-col p-6 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">
-                      <div className="absolute inset-0 bg-[image:var(--gradient-panel)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      <div className="relative flex flex-1 flex-col gap-3.5">
-                        <div className="flex items-start justify-between gap-3">
-                          <span className="grid h-11 w-11 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
-                            <p.icon className="h-5 w-5" />
-                          </span>
-                          <span className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-highlight">
-                            {p.tag}
-                          </span>
-                        </div>
-                        <h3 className="font-display text-xl font-semibold">{p.title}</h3>
-                        <p className="mt-auto text-sm leading-relaxed text-muted-foreground">
-                          {p.desc}
-                        </p>
-                        <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                  <SpotlightCard className="glass-panel flex h-full flex-col p-6 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">
+                    <div className="absolute inset-0 bg-[image:var(--gradient-panel)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <Link
+                      to="/products/$slug"
+                      params={{ slug: p.slug }}
+                      className="absolute inset-0 z-0"
+                      aria-label={`Open ${p.title}`}
+                    />
+                    <div className="pointer-events-none relative z-10 flex flex-1 flex-col gap-3.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="grid h-11 w-11 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
+                          <p.icon className="h-5 w-5" />
+                        </span>
+                        <span className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-highlight">
+                          {p.tag}
+                        </span>
+                      </div>
+                      <h3 className="font-display text-xl font-semibold">{p.title}</h3>
+                      <p className="mt-auto text-sm leading-relaxed text-muted-foreground">
+                        {p.desc}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                        <Link
+                          to="/products/$slug"
+                          params={{ slug: p.slug }}
+                          className="pointer-events-auto inline-flex items-center gap-1.5 text-xs font-semibold text-primary transition-colors hover:text-highlight"
+                        >
                           View showcase
                           <ArrowRight className="h-3.5 w-3.5" />
-                        </p>
+                        </Link>
+                        <ChatActionLink to="/products/$slug" params={{ slug: p.slug }} />
                       </div>
-                    </SpotlightCard>
-                  </Link>
+                    </div>
+                  </SpotlightCard>
                 </Reveal>
               ))}
             </div>
@@ -740,7 +763,7 @@ function Index() {
         {/* Contact */}
         <section id="contact" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 lg:px-8 lg:py-32">
           <Reveal>
-            <div className="text-center">
+            <div className="mx-auto flex flex-col items-center text-center">
               <SectionTitle eyebrow="Contact" title="Let's build something intelligent." />
               <p className="mx-auto mt-5 max-w-xl text-sm text-muted-foreground sm:text-base">
                 Tell us about your project and we'll come back with a plan, a timeline and an honest
