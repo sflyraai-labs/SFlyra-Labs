@@ -409,7 +409,7 @@ const FOUNDERS = [
     name: "Fatimah Noman",
     photo: fatimahPhoto,
     bio: "Leads product and engineering at SFlyra Labs, turning ambitious ideas into shipped, intelligent software.",
-    portfolio: "https://myportfolio-neon-chi-60.vercel.app/",
+    portfolio: "https://fatimah-ai.vercel.app/",
   },
   {
     name: "Summiya Ashraf",
