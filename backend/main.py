@@ -48,13 +48,23 @@ app = FastAPI(
     description="Product-specific OpenAI agents with automatic provider fallback.",
 )
 
-ALLOWED_ORIGINS = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:8080,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8080",
-).split(",")
+# SFlyra's production domain is always allowed (with and without www), so the
+# live site works even if CORS_ORIGINS only lists one form of the domain.
+_SFLYRA_ORIGINS = ("https://www.sflyra.site", "https://sflyra.site")
 
-# Allow any *.vercel.app origin so the deployed site can call the hosted backend
-# without configuring CORS manually. Tighten via the CORS_ORIGINS env var.
+_cfg_origins = (os.getenv("CORS_ORIGINS") or "").split(",")
+if not any(o.strip() for o in _cfg_origins):
+    _cfg_origins = (
+        "http://localhost:8080,http://localhost:5173,http://localhost:3000,http://127.0.0.1:8080"
+    ).split(",")
+
+# Env-configured origins + the SFlyra domain origins (deduped, never lost).
+ALLOWED_ORIGINS = [o.strip() for o in _cfg_origins if o.strip()] + [
+    o for o in _SFLYRA_ORIGINS if o.strip() not in {c.strip() for c in _cfg_origins if c.strip()}
+]
+
+# Allow any *.vercel.app origin so preview deployments can call the hosted backend
+# without configuring CORS manually.
 _VERCEL_APP_REGEX = r"https://[a-zA-Z0-9-]+\.vercel\.app"
 
 app.add_middleware(
