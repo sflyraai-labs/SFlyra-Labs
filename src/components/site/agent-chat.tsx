@@ -10,10 +10,25 @@ export type ChatMessage = {
   content: string;
 };
 
-const API_BASE =
-  (typeof import.meta !== "undefined" &&
-    (import.meta.env?.["VITE_SFLYRA_API"] as string | undefined)?.replace(/\/+$/, "")) ||
-  "http://localhost:8000";
+/**
+ * SFlyra AI backend base URL.
+ *
+ * Resolution order:
+ *   1. VITE_SFLYRA_API env var (set this in Vercel/CI to override)
+ *   2. Production build  -> hosted backend (sflyra.site default)
+ *   3. Local dev         -> localhost FastAPI on :8000
+ */
+const API_BASE = (() => {
+  const fromEnv =
+    typeof import.meta !== "undefined"
+      ? (import.meta.env?.["VITE_SFLYRA_API"] as string | undefined)?.replace(/\/+$/, "")
+      : undefined;
+  if (fromEnv) return fromEnv;
+  if (typeof import.meta !== "undefined" && import.meta.env?.PROD) {
+    return "https://backend-iota-one-27.vercel.app";
+  }
+  return "http://localhost:8000";
+})();
 
 const SUGGESTION_MAP: Record<string, string[]> = {
   "ai-chatbot": [
@@ -91,10 +106,7 @@ function StatusDot() {
 /**
  * Streaming reader for Server-Sent Events consumed via fetch (POST body support).
  */
-async function readSSE(
-  res: Response,
-  onEvent: (event: string, data: string) => void,
-) {
+async function readSSE(res: Response, onEvent: (event: string, data: string) => void) {
   if (!res.body) return;
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -141,9 +153,7 @@ export function AgentChatPanel({
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [online, setOnline] = useState<"checking" | "online" | "offline">(
-    "checking",
-  );
+  const [online, setOnline] = useState<"checking" | "online" | "offline">("checking");
 
   const draftRef = useRef("");
   const abortRef = useRef<AbortController | null>(null);
@@ -310,11 +320,7 @@ export function AgentChatPanel({
             }`}
           >
             <StatusDot />
-            {online === "online"
-              ? "Live"
-              : online === "offline"
-                ? "Offline"
-                : "Connecting"}
+            {online === "online" ? "Live" : online === "offline" ? "Offline" : "Connecting"}
           </span>
           <button
             onClick={reset}
@@ -327,10 +333,7 @@ export function AgentChatPanel({
       </div>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="h-80 space-y-3 overflow-y-auto px-4 py-4 sm:h-96"
-      >
+      <div ref={scrollRef} className="h-80 space-y-3 overflow-y-auto px-4 py-4 sm:h-96">
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
@@ -338,8 +341,8 @@ export function AgentChatPanel({
             </span>
             <p className="text-sm font-semibold">Ask me anything about {agentName}.</p>
             <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
-              I'm the dedicated SFlyra agent for this page — type a question or tap a
-              quick prompt below.
+              I'm the dedicated SFlyra agent for this page — type a question or tap a quick prompt
+              below.
             </p>
           </div>
         )}
