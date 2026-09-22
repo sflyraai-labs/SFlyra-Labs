@@ -23,6 +23,7 @@ import fatimahPhoto from "@/assets/fatimah.jpg";
 import sumiyaPhoto from "@/assets/sumi.jpg";
 import { Sparkles, SparkleBurst } from "@/components/site/Sparkles";
 import { ChatActionLink } from "@/components/site/site-ui";
+// import { DemoVideo } from "@/components/site/demo-video";
 import { PRODUCTS, SERVICES } from "@/lib/catalog";
 import {
   Accordion,
@@ -384,12 +385,7 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
 
 /* Services & Products data moved to src/lib/catalog.tsx */
 
-const STATS = [
-  "5 services",
-  "1 team",
-  "4-step process",
-  "SFlyra — our own product",
-];
+const STATS = ["5 services", "1 team", "4-step process", "SFlyra — our own product"];
 
 function serviceSpan(i: number) {
   if (i === 0 || i === 3) return "lg:col-span-2";
@@ -398,7 +394,11 @@ function serviceSpan(i: number) {
 }
 
 const PROCESS = [
-  { n: "01", t: "Discover", d: "We map your goals, users and the friction hiding inside your process." },
+  {
+    n: "01",
+    t: "Discover",
+    d: "We map your goals, users and the friction hiding inside your process.",
+  },
   { n: "02", t: "Design", d: "Interfaces and systems shaped around clarity, not decoration." },
   { n: "03", t: "Build", d: "Clean engineering with AI woven into the parts that deserve it." },
   { n: "04", t: "Launch", d: "Ship, measure, refine — and hand you something you can grow with." },
@@ -483,17 +483,17 @@ function Index() {
         <section className="mx-auto grid max-w-7xl items-center gap-14 px-5 pt-36 pb-20 lg:grid-cols-2 lg:px-8 lg:pt-44 lg:pb-28">
           <div className="animate-rise">
             <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs text-highlight">
-              <Sparkle className="h-3.5 w-3.5" /> Building Intelligence. Fusing Ideas.
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-medium text-emerald-600 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_currentColor]" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs text-highlight">
+                <Sparkle className="h-3.5 w-3.5" /> Building Intelligence. Fusing Ideas.
               </span>
-              SFlyra Labs: Autonomous Systems Online
-            </span>
-          </div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-medium text-emerald-600 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_currentColor]" />
+                </span>
+                SFlyra Labs: Autonomous Systems Online
+              </span>
+            </div>
             <h1 className="mt-6 font-display text-4xl leading-[1.02] font-bold tracking-tight text-balance sm:text-6xl lg:text-7xl">
               We build <span className="text-gradient">intelligence</span> into every process.
             </h1>
@@ -502,9 +502,7 @@ function Index() {
               workflows — crafting systems that think, act and scale alongside your team.
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
-              <PrimaryButton href="#contact">
-                Start a project
-              </PrimaryButton>
+              <PrimaryButton href="#contact">Start a project</PrimaryButton>
               <GhostButton href="#product">Explore SFlyra</GhostButton>
             </div>
           </div>
@@ -533,9 +531,15 @@ function Index() {
         </section>
 
         {/* Services */}
-        <section id="services" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 lg:px-8 lg:py-32">
+        <section
+          id="services"
+          className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 lg:px-8 lg:py-32"
+        >
           <Reveal>
-            <SectionTitle eyebrow="What We Do" title="Custom work, built around how your business actually runs." />
+            <SectionTitle
+              eyebrow="What We Do"
+              title="Custom work, built around how your business actually runs."
+            />
           </Reveal>
           <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {SERVICES.map((s, i) => (
@@ -604,10 +608,14 @@ function Index() {
               </div>
             </Reveal>
 
-            {/* Product cards — clean, balanced grid */}
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+            {/* Product demo video — see SFlyra in action */}
+            {/* Temporarily disabled — will be pushed later.
+                <DemoVideo /> */}
+
+            {/* Product cards — 3 on top, 3 below (3-col grid) */}
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
               {PRODUCTS.map((p, i) => (
-                <Reveal key={p.title} delay={(i % 4) * 0.06}>
+                <Reveal key={p.title} delay={(i % 3) * 0.06}>
                   <SpotlightCard className="glass-panel flex h-full flex-col p-6 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">
                     <div className="absolute inset-0 bg-[image:var(--gradient-panel)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     <Link
@@ -749,19 +757,22 @@ function Index() {
         </section>
 
         {/* Statement */}
-<section className="border-y border-border/60">
+        <section className="border-y border-border/60">
           <Reveal>
             <div className="mx-auto max-w-4xl px-5 py-24 text-center lg:py-32">
               <p className="font-display text-2xl leading-snug italic sm:text-4xl">
-                "AI should not replace your process — it should understand it, refine it, and quietly
-                make it brilliant."
+                "AI should not replace your process — it should understand it, refine it, and
+                quietly make it brilliant."
               </p>
             </div>
           </Reveal>
         </section>
 
         {/* Contact */}
-        <section id="contact" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 lg:px-8 lg:py-32">
+        <section
+          id="contact"
+          className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 lg:px-8 lg:py-32"
+        >
           <Reveal>
             <div className="mx-auto flex flex-col items-center text-center">
               <SectionTitle eyebrow="Contact" title="Let's build something intelligent." />
@@ -785,8 +796,8 @@ function Index() {
                     </span>
                     <h3 className="mt-6 font-display text-2xl font-semibold">Message sent!</h3>
                     <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                      Thanks for reaching out — we'll get back to you within 24 hours with a plan,
-                      a timeline and an honest estimate.
+                      Thanks for reaching out — we'll get back to you within 24 hours with a plan, a
+                      timeline and an honest estimate.
                     </p>
                     <button
                       type="button"
