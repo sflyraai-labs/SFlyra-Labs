@@ -6,6 +6,7 @@ import {
   Bot,
   Check,
   CheckCircle2,
+  Facebook,
   Instagram,
   Mail,
   MessageSquare,
@@ -933,7 +934,7 @@ function Index() {
 
                 {/* Instagram */}
                 <a
-                  href="https://instagram.com/sflyralabs"
+                  href="https://www.instagram.com/sflyra_labs/"
                   target="_blank"
                   rel="noreferrer"
                   className="group glass-panel flex items-center gap-4 rounded-3xl p-5 transition-all duration-300 hover:-translate-y-0.5"
@@ -945,7 +946,25 @@ function Index() {
                     <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Instagram
                     </p>
-                    <p className="mt-0.5 truncate text-sm font-medium">@sflyralabs</p>
+                    <p className="mt-0.5 truncate text-sm font-medium">@sflyra_labs</p>
+                  </div>
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href="https://www.facebook.com/profile.php?id=61594396690562"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group glass-panel flex items-center gap-4 rounded-3xl p-5 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Facebook className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Facebook
+                    </p>
+                    <p className="mt-0.5 truncate text-sm font-medium">SFlyra Labs</p>
                   </div>
                 </a>
 

@@ -36,7 +36,7 @@ SECTIONS (in this order):
 
 9. Statement section — a large italic pull-quote about our philosophy on AI and process.
 
-10. Contact section — big CTA headline "Let's build something intelligent," with email and Instagram contact links listed.
+10. Contact section — big CTA headline "Let's build something intelligent," with email, Instagram and Facebook contact links listed.
 
 11. Footer — logo, tagline, copyright.
 

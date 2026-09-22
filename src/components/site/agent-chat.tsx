@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Bot, RefreshCcw, Send, Sparkles } from "lucide-react";
 
 import { StatusPill } from "@/components/site/site-ui";
@@ -423,6 +423,37 @@ export function AgentChatPanel({
   );
 }
 
+/**
+ * Renders assistant text with clickable links.
+ * Supports Markdown links ([text](url)) and raw https:// URLs.
+ */
+function linkify(text: string): ReactNode[] {
+  const LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s]+)/g;
+  const nodes: ReactNode[] = [];
+  let last = 0;
+  let key = 0;
+  let m: RegExpExecArray | null;
+  while ((m = LINK_RE.exec(text)) !== null) {
+    if (m.index > last) nodes.push(text.slice(last, m.index));
+    const href = m[2] ?? m[0].replace(/[,.;:!?)]+$/, "");
+    const label = m[1] ?? m[0];
+    nodes.push(
+      <a
+        key={key++}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-primary underline decoration-primary/40 underline-offset-2 transition-colors hover:text-highlight hover:decoration-highlight/60"
+      >
+        {label}
+      </a>,
+    );
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
 function Bubble({ message }: { message: ChatMessage }) {
   if (message.role === "user") {
     return (
@@ -440,7 +471,7 @@ function Bubble({ message }: { message: ChatMessage }) {
     <div className="flex items-end gap-2">
       <Avatar />
       <div className="glass-panel max-w-[85%] rounded-2xl rounded-bl-md px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap text-foreground">
-        {message.content}
+        {linkify(message.content)}
       </div>
     </div>
   );

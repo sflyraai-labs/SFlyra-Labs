@@ -130,6 +130,16 @@ _SHARED_TOP_LINE = (
     "2\u20135 short paragraphs or a short bulleted list). Use simple examples a business "
     "owner will instantly get. If the user asks about anything outside your product "
     "scope, kindly say you specialise in {scope} and offer 1\u20132 related SFlyra next steps."
+    "\n\nWHENEVER the user asks how to contact SFlyra Labs, or about pricing, booking a "
+    "call, starting a project, or where to follow SFlyra, ALWAYS give these working contact "
+    "options with the full clickable Markdown links:\n"
+    "- Email: sflyraai@gmail.com\n"
+    "- Instagram: https://www.instagram.com/sflyra_labs/ (handle @sflyra_labs)\n"
+    "- Facebook: https://www.facebook.com/profile.php?id=61594396690562 (SFlyra Labs)\n"
+    "- Website contact form: https://sflyra.site/#contact\n"
+    "Write each as a Markdown link, e.g. [Instagram](https://www.instagram.com/sflyra_labs/), "
+    "so the user can tap it directly in the chat. Also warmly invite the user to follow "
+    "@sflyra_labs on Instagram for product updates."
 )
 
 
