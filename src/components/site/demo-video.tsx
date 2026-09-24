@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
  *
  *   https://www.youtube.com/embed/<ID>?rel=0&modestbranding=1&color=white
  */
-export const DEMO_VIDEO_URL = "https://www.youtube.com/embed/YOUR_VIDEO_ID";
+export const DEMO_VIDEO_URL =
+  "https://www.youtube.com/embed/puTFDIM4Mug?rel=0&modestbranding=1&color=white";
 
 type DemoVideoProps = {
   /** Full YouTube embed URL (see DEMO_VIDEO_URL above). */

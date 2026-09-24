@@ -24,7 +24,7 @@ import fatimahPhoto from "@/assets/fatimah.jpg";
 import sumiyaPhoto from "@/assets/sumi.jpg";
 import { Sparkles, SparkleBurst } from "@/components/site/Sparkles";
 import { ChatActionLink } from "@/components/site/site-ui";
-// import { DemoVideo } from "@/components/site/demo-video";
+import { DemoVideo } from "@/components/site/demo-video";
 import { PRODUCTS, SERVICES } from "@/lib/catalog";
 import {
   Accordion,
@@ -610,8 +610,7 @@ function Index() {
             </Reveal>
 
             {/* Product demo video — see SFlyra in action */}
-            {/* Temporarily disabled — will be pushed later.
-                <DemoVideo /> */}
+            <DemoVideo />
 
             {/* Product cards — 3 on top, 3 below (3-col grid) */}
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
