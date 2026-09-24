@@ -494,48 +494,6 @@ const FAQ = [
   },
 ];
 
-const PRICING = [
-  {
-    name: "Starter",
-    price: "$490",
-    priceNote: "project, from",
-    desc: "One focused build for businesses taking their first step with AI.",
-    features: [
-      "1 ready-made AI tool",
-      "Website or DM integration",
-      "Training on your business",
-      "30 days of support",
-    ],
-    highlight: false,
-  },
-  {
-    name: "Growth",
-    price: "$1,490",
-    priceNote: "project, from",
-    desc: "A full automation setup that streamlines how leads and content move.",
-    features: [
-      "2–3 connected AI agents",
-      "Custom workflows & integrations",
-      "AI-assisted content system",
-      "60 days of support + tuning",
-    ],
-    highlight: true,
-  },
-  {
-    name: "Custom",
-    price: "Let's talk",
-    priceNote: "scoped to you",
-    desc: "Bespoke agentic systems built for your exact workflows and data.",
-    features: [
-      "Dedicated AI employee/s",
-      "CRM & tool integration",
-      "Brand-tuned voice & processes",
-      "Ongoing training & maintenance",
-    ],
-    highlight: false,
-  },
-];
-
 const BLOG_POSTS = [
   {
     tag: "AI Agents",
@@ -937,64 +895,6 @@ function Index() {
               </p>
             </div>
           </Reveal>
-        </section>
-
-        {/* Pricing */}
-        <section id="pricing" className="scroll-mt-24 border-y border-border/60 bg-card/40">
-          <div className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
-            <Reveal>
-              <SectionTitle eyebrow="Pricing" title="Honest pricing, no surprises." />
-            </Reveal>
-            <Reveal delay={0.1}>
-              <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:items-stretch">
-                {PRICING.map((tier) => (
-                  <div
-                    key={tier.name}
-                    className={`relative flex h-full flex-col rounded-3xl p-8 transition-transform duration-300 hover:-translate-y-1 ${
-                      tier.highlight
-                        ? "border border-primary/50 bg-[image:var(--gradient-panel)] shadow-xl shadow-primary/10 glow-soft"
-                        : "glass-panel glow-soft hover:glow-strong"
-                    }`}
-                  >
-                    {tier.highlight && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[image:var(--gradient-primary)] px-3.5 py-1 text-[10px] font-bold tracking-wider text-primary-foreground uppercase">
-                        Most popular
-                      </span>
-                    )}
-                    <p className="text-[11px] font-semibold tracking-[0.25em] text-primary uppercase">
-                      {tier.name}
-                    </p>
-                    <p className="mt-4 font-display text-4xl font-bold tracking-tight">
-                      {tier.price}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">{tier.priceNote}</p>
-                    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                      {tier.desc}
-                    </p>
-                    <ul className="mt-6 flex flex-1 flex-col gap-3">
-                      {tier.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2.5 text-sm">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <a
-                      href="#contact"
-                      className={`group relative mt-8 inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 ${
-                        tier.highlight
-                          ? "bg-[image:var(--gradient-primary)] text-primary-foreground"
-                          : "border border-primary/40 text-foreground hover:bg-primary/10"
-                      }`}
-                    >
-                      Get a quote
-                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
         </section>
 
         {/* Contact */}

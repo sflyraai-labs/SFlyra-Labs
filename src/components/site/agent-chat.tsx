@@ -14,20 +14,18 @@ export type ChatMessage = {
  * SFlyra AI backend base URL.
  *
  * Resolution order:
- *   1. VITE_SFLYRA_API env var (set this in Vercel/CI to override)
- *   2. Production build  -> hosted backend (sflyra.site default)
- *   3. Local dev         -> localhost FastAPI on :8000
+ *   1. VITE_SFLYRA_API env var (set in Vercel/CI, or locally, to override)
+ *   2. Hosted backend — used in production AND local dev so the chat works
+ *      out of the box without running a local FastAPI server. Point
+ *      VITE_SFLYRA_API at your own backend if you need to override.
  */
+const HOSTED_API = "https://backend-iota-one-27.vercel.app";
 const API_BASE = (() => {
   const fromEnv =
     typeof import.meta !== "undefined"
       ? (import.meta.env?.["VITE_SFLYRA_API"] as string | undefined)?.replace(/\/+$/, "")
       : undefined;
-  if (fromEnv) return fromEnv;
-  if (typeof import.meta !== "undefined" && import.meta.env?.PROD) {
-    return "https://backend-iota-one-27.vercel.app";
-  }
-  return "http://localhost:8000";
+  return fromEnv || HOSTED_API;
 })();
 
 const SUGGESTION_MAP: Record<string, string[]> = {
@@ -94,8 +92,12 @@ const DEFAULT_SUGGESTIONS = [
   "What's the next step?",
 ];
 
-function StatusDot() {
-  return (
+function StatusDot({ offline = false }: { offline?: boolean }) {
+  return offline ? (
+    <span className="relative flex h-2 w-2">
+      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
+    </span>
+  ) : (
     <span className="relative flex h-2 w-2">
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
       <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_currentColor]" />
@@ -163,17 +165,42 @@ export function AgentChatPanel({
   const suggestions = SUGGESTION_MAP[agentId] ?? DEFAULT_SUGGESTIONS;
 
   useEffect(() => {
-    const ctrl = new AbortController();
-    const check = async () => {
+    let disposed = false;
+    let retryTimer: number | undefined;
+
+    /**
+     * Health check with retries so a transient backend cold-start or network
+     * blip doesn't permanently mark the agent as "Offline". Each attempt is
+     * time-bounded so the badge never hangs on "Connecting" forever.
+     */
+    const attempt = async (tryCount: number) => {
+      const ctrl = new AbortController();
+      const timeout = window.setTimeout(() => ctrl.abort(), 4000);
       try {
         const res = await fetch(`${API_BASE}/api/health`, { signal: ctrl.signal });
-        setOnline(res.ok ? "online" : "offline");
+        if (disposed) return;
+        if (res.ok || tryCount >= 3) {
+          setOnline(res.ok ? "online" : "offline");
+        } else {
+          retryTimer = window.setTimeout(() => void attempt(tryCount + 1), tryCount * 800 + 400);
+        }
       } catch {
-        setOnline("offline");
+        if (disposed) return;
+        if (tryCount >= 3) {
+          setOnline("offline");
+        } else {
+          retryTimer = window.setTimeout(() => void attempt(tryCount + 1), tryCount * 800 + 400);
+        }
+      } finally {
+        window.clearTimeout(timeout);
       }
     };
-    void check();
-    return () => ctrl.abort();
+
+    void attempt(0);
+    return () => {
+      disposed = true;
+      if (retryTimer) window.clearTimeout(retryTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -187,8 +214,10 @@ export function AgentChatPanel({
 
   const ask = async (text: string) => {
     const content = (text ?? input).trim();
-    const wasOnline = online === "online";
-    if (!content || thinking || !wasOnline) return;
+    // Optimistic: only block once the backend is confirmed unreachable, so
+    // the panel stays usable while the health probe is still running.
+    const blocked = online === "offline";
+    if (!content || thinking || blocked) return;
 
     const history: ChatMessage[] = [...messages, { role: "user", content }];
     setMessages(history);
@@ -272,11 +301,7 @@ export function AgentChatPanel({
         setThinking(false);
         return;
       }
-      setError(
-        !wasOnline
-          ? "Backend is offline. Start it with `uvicorn main:app --port 8000`."
-          : "Could not reach the agent. Please try again.",
-      );
+      setError("Could not reach the agent. Please check your connection and try again.");
       setThinking(false);
     } finally {
       abortRef.current = null;
@@ -319,7 +344,7 @@ export function AgentChatPanel({
                   : "border-border bg-card/60 text-muted-foreground"
             }`}
           >
-            <StatusDot />
+            <StatusDot offline={online === "offline"} />
             {online === "online" ? "Live" : online === "offline" ? "Offline" : "Connecting"}
           </span>
           <button
@@ -366,7 +391,7 @@ export function AgentChatPanel({
       </div>
 
       {/* Suggestions */}
-      {messages.length === 0 && online === "online" && (
+      {messages.length === 0 && online !== "offline" && (
         <div className="flex flex-wrap gap-2 border-t border-border/60 px-4 py-3">
           {suggestions.map((s) => (
             <button
@@ -400,17 +425,17 @@ export function AgentChatPanel({
             }}
             placeholder={
               online === "offline"
-                ? "Backend offline — start uvicorn :8000"
+                ? "Agent unreachable — try again shortly"
                 : thinking
                   ? "Agent is replying…"
                   : "Type your question…"
             }
-            disabled={online !== "online" || thinking}
+            disabled={online === "offline" || thinking}
             className="min-w-0 flex-1 rounded-xl border border-border bg-card/70 px-4 py-2.5 text-sm outline-none transition placeholder:text-muted-foreground/70 focus:border-primary/50 focus:ring-4 focus:ring-primary/15 disabled:opacity-50"
           />
           <button
             onClick={() => void ask(input)}
-            disabled={!input.trim() || thinking || online !== "online"}
+            disabled={!input.trim() || thinking || online === "offline"}
             aria-label="Send message"
             className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white shadow-lg shadow-primary/25 transition hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none"
             style={{ background: "var(--gradient-primary)" }}

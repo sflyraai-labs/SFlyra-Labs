@@ -67,10 +67,14 @@ ALLOWED_ORIGINS = [o.strip() for o in _cfg_origins if o.strip()] + [
 # without configuring CORS manually.
 _VERCEL_APP_REGEX = r"https://[a-zA-Z0-9-]+\.vercel\.app"
 
+# Allow any local dev/preview origin (localhost:5173, :4173, :8080, …) so running
+# the site locally against the hosted backend never trips CORS.
+_LOCAL_ORIGIN_REGEX = r"https?://(?:localhost|127\.0\.0\.1)(?::\d+)?"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in ALLOWED_ORIGINS if o.strip()],
-    allow_origin_regex=_VERCEL_APP_REGEX,
+    allow_origin_regex=rf"{_LOCAL_ORIGIN_REGEX}|{_VERCEL_APP_REGEX}",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

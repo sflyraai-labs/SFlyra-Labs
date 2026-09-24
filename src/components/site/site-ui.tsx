@@ -26,11 +26,10 @@ import { cn } from "@/lib/utils";
 
 /**
  * WhatsApp contact number (international format, no "+" or spaces).
- *
- * TODO: Swap this placeholder for the real SFlyra number once it's shared —
- * the buttons across the footer and contact section update automatically.
+ * +92 03482208865 -> 92 3482208865. Every wa.me link on the site
+ * (footer, contact section, chat links) updates from this one value.
  */
-export const WHATSAPP_NUMBER = "923XXXXXXXXX";
+export const WHATSAPP_NUMBER = "923482208865";
 
 export function whatsappHref(message?: string) {
   const base = `https://wa.me/${WHATSAPP_NUMBER}`;
