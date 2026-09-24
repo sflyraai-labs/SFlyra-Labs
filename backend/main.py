@@ -127,6 +127,7 @@ class AgentInfo(BaseModel):
 # Routes
 # ---------------------------------------------------------------------------
 _AGENT_DESCRIPTIONS = {
+    "sflyra-concierge": "Your whole-site guide — every SFlyra product, service and how to start with us.",
     "ai-chatbot": "Ready-to-deploy chatbot for your website and Instagram DMs.",
     "email-whatsapp-automation": "Triggered email & WhatsApp flows, auto-replies and CRM sync.",
     "social-media-auto-poster": "Auto-generate captions and schedule posts across platforms.",

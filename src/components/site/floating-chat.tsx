@@ -5,6 +5,7 @@ import { AgentChatPanel } from "@/components/site/agent-chat";
 
 /** Every agent sold by SFlyra — pick one to talk to. */
 const AGENTS = [
+  { id: "sflyra-concierge", name: "SFlyra Concierge — whole site" },
   { id: "ai-chatbot", name: "AI Chatbot" },
   { id: "email-whatsapp-automation", name: "Email/WhatsApp Automation" },
   { id: "social-media-auto-poster", name: "Social Media Auto-Poster" },
@@ -25,7 +26,7 @@ const AGENTS = [
  */
 export function FloatingChatWidget() {
   const [open, setOpen] = useState(false);
-  const [agentId, setAgentId] = useState("ai-chatbot");
+  const [agentId, setAgentId] = useState("sflyra-concierge");
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

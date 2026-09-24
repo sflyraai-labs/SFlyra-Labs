@@ -29,6 +29,11 @@ const API_BASE = (() => {
 })();
 
 const SUGGESTION_MAP: Record<string, string[]> = {
+  "sflyra-concierge": [
+    "What services and products do you offer?",
+    "I need a website — which agent handles that?",
+    "How can I contact SFlyra Labs?",
+  ],
   "ai-chatbot": [
     "What types of chatbot can you build?",
     "How long does deployment take?",
@@ -364,10 +369,15 @@ export function AgentChatPanel({
             <span className="grid h-12 w-12 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
               <Sparkles className="h-5 w-5" />
             </span>
-            <p className="text-sm font-semibold">Ask me anything about {agentName}.</p>
+            <p className="text-sm font-semibold">
+              {agentId === "sflyra-concierge"
+                ? "Ask me anything about SFlyra."
+                : `Ask me anything about ${agentName}.`}
+            </p>
             <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
-              I'm the dedicated SFlyra agent for this page — type a question or tap a quick prompt
-              below.
+              {agentId === "sflyra-concierge"
+                ? "I'm the whole-site guide — I know every product, service and agent, and I'll point you to the right one. Type a question or tap a prompt."
+                : "I'm the dedicated SFlyra agent for this page — type a question or tap a quick prompt below."}
             </p>
           </div>
         )}
