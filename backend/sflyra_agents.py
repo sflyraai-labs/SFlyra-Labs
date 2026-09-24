@@ -128,8 +128,14 @@ _SHARED_TOP_LINE = (
     "You are a helpful AI specialist at SFlyra Labs. Talk in the customer's language. "
     "Keep answers for the live product page: friendly, concrete, and concise (aim for "
     "2\u20135 short paragraphs or a short bulleted list). Use simple examples a business "
-    "owner will instantly get. If the user asks about anything outside your product "
-    "scope, kindly say you specialise in {scope} and offer 1\u20132 related SFlyra next steps."
+    "owner will instantly get. If the user asks about a DIFFERENT SFlyra product or service, "
+    "do NOT say you can't help and never call it out of scope \u2014 route them positively instead: "
+    "tell them to switch to the right agent in this chat's selector and share the exact page "
+    "link where they can hit \"Chat with agent\" (e.g. https://sflyra.site/services/web-development#agent-chat "
+    "for websites, https://sflyra.site/products/ai-chatbot#agent-chat for chatbots). "
+    "SFlyra offerings \u2014 products: ai-chatbot, email-whatsapp-automation, social-media-auto-poster, "
+    "ai-content-writer, ai-automation, agentic-workflows, ai-chatbot-development; services: "
+    "web-development, graphic-designing, digital-marketing, video-animation, video-editing."
     "\n\nWHENEVER the user asks how to contact SFlyra Labs, or about pricing, booking a "
     "call, starting a project, or where to follow SFlyra, ALWAYS give these working contact "
     "options with the full clickable Markdown links:\n"
@@ -366,13 +372,17 @@ def _concierge_agent(model) -> Agent:
             "— give a friendly COMPLETE overview: all 6 products and all 5 services in one short "
             "line each, and mention that every offering has a dedicated agent they can switch to "
             "from the selector at the top of this chat panel.\n"
-            "2) If the user asks for DETAILS about one specific product or service, give a short "
-            '2-3 sentence overview, then HAND OFF with both: (a) tell them to switch to the '
-            'dedicated "<Name>" agent using the selector at the top of this chat panel for full '
-            "details, and (b) paste the clickable page link for that offering as a Markdown link "
-            "like [AI Chatbot — full details](https://sflyra.site/products/ai-chatbot#agent-chat).\n"
-            "3) Whenever contact details, pricing, booking a call or starting a project comes up, "
-            "give the contact options from your shared instructions (WhatsApp, Instagram, "
+            "2) If the user asks about META or asks for DETAILS of one specific product or service, "
+            "give a short 2-3 sentence overview, then HAND OFF with both: (a) tell them to switch to "
+            'the dedicated "<Name>" agent using the selector at the top of this chat panel, and (b) '
+            "give the exact page link for that offering as a Markdown link with the page's own "
+            "\"Chat with agent\" option, e.g. [Web Development — chat with the agent]"
+            "(https://sflyra.site/services/web-development#agent-chat) or "
+            "[AI Chatbot — chat with the agent](https://sflyra.site/products/ai-chatbot#agent-chat).\n"
+            "3) Never say you can't help or that something is out of your scope — SFlyra covers all "
+            "of this: you ALWAYS route the user to the right agent/page. Whenever the user wants to "
+            "start a project, asks about pricing, booking a call, or anywhere contact details make "
+            "sense, give the contact options from your shared instructions (WhatsApp, Instagram, "
             "Facebook, contact form) as clickable links and warmly invite them to follow "
             "@sflyra_labs on Instagram.\n"
             "Keep every answer friendly, concrete and concise — 2-5 short paragraphs or bullet "
@@ -380,6 +390,152 @@ def _concierge_agent(model) -> Agent:
         ),
         model=model,
     )
+
+
+# ---------------------------------------------------------------------------
+# Concierge routing — deterministic offering detection + ready-to-stream handoff
+# ---------------------------------------------------------------------------
+# (keywords, offering title, kind (products|services), slug). Ordered most
+# specific first so e.g. "custom chatbot development" beats plain "chatbot".
+_OFFERINGS: tuple[tuple[tuple[str, ...], str, str, str], ...] = (
+    (
+        (
+            "web development", "web dev", "website", "web site", "web app", "web application",
+            "landing page", "online store", "ecommerce", "e-commerce", "shopify", "wordpress",
+            "site for my", "website for my business", "build me a site",
+        ),
+        "Web Development",
+        "services",
+        "web-development",
+    ),
+    (
+        (
+            "ai chatbot development", "custom chatbot", "chatbot development", "build a chatbot",
+            "build my chatbot", "develop a chatbot", "develop my own chatbot",
+        ),
+        "AI Chatbot Development",
+        "products",
+        "ai-chatbot-development",
+    ),
+    (
+        (
+            "chatbot", "ai chat bot", "faq bot", "customer support bot", "lead generation bot",
+            "instagram dm bot", "booking bot", "dm bot", "chat bot",
+        ),
+        "AI Chatbot",
+        "products",
+        "ai-chatbot",
+    ),
+    (
+        (
+            "whatsapp automation", "email automation", "email marketing automation", "auto reply",
+            "auto-reply", "follow-up email", "follow up email", "follow-up sequence", "crm sync",
+            "whatsapp message", "whatsapp flow", "email sequence",
+        ),
+        "Email/WhatsApp Automation",
+        "products",
+        "email-whatsapp-automation",
+    ),
+    (
+        (
+            "social media auto", "auto poster", "auto-post", "post scheduling", "schedule posts",
+            "social media scheduling", "captions for instagram", "auto post", "auto-posting",
+            "content calendar for social",
+        ),
+        "Social Media Auto-Poster",
+        "products",
+        "social-media-auto-poster",
+    ),
+    (
+        (
+            "content writer", "content writing", "blog", "blog post", "product description",
+            "ad copy", "write captions", "copywriting",
+        ),
+        "AI Content Writer",
+        "products",
+        "ai-content-writer",
+    ),
+    (
+        (
+            "ai automation", "automate", "automation flow", "back office", "workflow automation",
+            "automation for my",
+        ),
+        "AI Automation",
+        "products",
+        "ai-automation",
+    ),
+    (
+        (
+            "agentic", "multi-step", "multi step", "autonomous agent", "research agent",
+            "agents that act",
+        ),
+        "Agentic Workflows",
+        "products",
+        "agentic-workflows",
+    ),
+    (
+        (
+            "graphic design", "graphic designing", "logo", "brand kit", "branding",
+            "brand identity", "social media creatives", "poster design", "flyer", "banner",
+        ),
+        "Graphic Designing",
+        "services",
+        "graphic-designing",
+    ),
+    (
+        (
+            "digital marketing", "marketing", "social growth", "paid ads", "google ads",
+            "instagram growth", "content calendar", "run ads", "ad campaign", "monthly marketing",
+        ),
+        "Digital Marketing",
+        "services",
+        "digital-marketing",
+    ),
+    (
+        (
+            "video animation", "animation", "explainer", "motion graphics", "brand story video",
+            "whiteboard video", "animated",
+        ),
+        "Video Animation",
+        "services",
+        "video-animation",
+    ),
+    (
+        (
+            "video editing", "editing my", "reels", "shorts", "tiktok", "podcast clip",
+            "youtube edit", "short-form", "short form", "edit videos",
+        ),
+        "Video Editing",
+        "services",
+        "video-editing",
+    ),
+)
+
+
+def _concierge_handoff(query: str) -> str | None:
+    """Deterministically detect which SFlyra offering the user is asking about and
+    return a ready-to-stream handoff message (page link + live 'Chat with agent'
+    + direct contact info). Returns None when no offering is detected so the LLM
+    answers the conversation naturally."""
+    q = query.lower()
+    for keywords, title, kind, slug in _OFFERINGS:
+        if any(kw in q for kw in keywords):
+            page = f"https://sflyra.site/{kind}/{slug}#agent-chat"
+            return (
+                f"Yes, we handle that — it's our {title} offering.\n\n"
+                f"Open the {title} page → [{title} — chat with the live agent]({page}) and hit the "
+                f"\"Chat with agent\" button there to talk to that specialist directly (or to our "
+                f"team). You can also switch to the {title} agent right here from the selector at "
+                f"the top of this panel.\n\n"
+                f"Prefer to talk to us directly? Here's everything:\n"
+                f"- Email: sflyraai@gmail.com\n"
+                f"- WhatsApp: [Chat on WhatsApp](https://wa.me/923482208865) — fastest reply\n"
+                f"- Instagram: [@sflyra_labs](https://www.instagram.com/sflyra_labs/)\n"
+                f"- Facebook: [SFlyra Labs](https://www.facebook.com/profile.php?id=61594396690562)\n"
+                f"- Contact form: [Contact Us](https://sflyra.site/#contact)\n\n"
+                f"Want me to explain a bit more about {title} first?"
+            )
+    return None
 
 
 # ---------------------------------------------------------------------------
