@@ -512,6 +512,11 @@ function Index() {
           </div>
         </section>
 
+        {/* Company demo video — whole-website tour */}
+        <section className="mx-auto max-w-7xl px-5 pb-24 lg:px-8">
+          <DemoVideo />
+        </section>
+
         {/* Stats strip */}
         <section className="border-y border-border/60 bg-card/30">
           <Reveal className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-5 py-6 text-center lg:grid-cols-4 lg:px-8">
@@ -609,11 +614,18 @@ function Index() {
               </div>
             </Reveal>
 
-            {/* Product demo video — see SFlyra in action */}
-            <DemoVideo />
-
             {/* Product cards — 3 on top, 3 below (3-col grid) */}
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+            <Reveal>
+              <div className="mt-16 mb-10 text-center">
+                <p className="text-[11px] font-semibold tracking-[0.25em] text-primary uppercase">
+                  The lineup
+                </p>
+                <h3 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                  Ready-to-deploy <span className="text-gradient">SFlyra products</span>
+                </h3>
+              </div>
+            </Reveal>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
               {PRODUCTS.map((p, i) => (
                 <Reveal key={p.title} delay={(i % 3) * 0.06}>
                   <SpotlightCard className="glass-panel flex h-full flex-col p-6 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">

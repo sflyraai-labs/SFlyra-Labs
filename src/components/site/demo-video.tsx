@@ -33,10 +33,10 @@ type DemoVideoProps = {
 
 export function DemoVideo({
   videoUrl = DEMO_VIDEO_URL,
-  badgeLabel = "SFlyra Walkthrough",
-  heading = "See SFlyra in Action",
-  highlight = "SFlyra",
-  subtext = "Watch how our autonomous workflows and custom AI tools integrate into your operations.",
+  badgeLabel = "Video tour",
+  heading = "See what we're building.",
+  highlight = "building",
+  subtext = "A look inside how SFlyra Labs designs, builds and ships intelligent systems — websites, AI agents and automations that run on autopilot.",
   className,
 }: DemoVideoProps) {
   const [before, after] = heading.split(highlight);
