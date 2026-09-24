@@ -15,16 +15,22 @@ import { AgentChatPanel } from "@/components/site/agent-chat";
 import { SERVICES, findService } from "@/lib/catalog";
 
 export const Route = createFileRoute("/services/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Services — SFlyra Labs" },
-      {
-        name: "description",
-        content:
-          "Dedicated service pages from SFlyra Labs — web development, design, marketing, and video.",
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const service = findService(params.slug);
+    return {
+      meta: [
+        {
+          title: service ? `${service.title} — SFlyra Labs` : "Service not found — SFlyra Labs",
+        },
+        {
+          name: "description",
+          content: service
+            ? `${service.title} from SFlyra Labs. ${service.long}`
+            : "Dedicated service pages from SFlyra Labs — web development, design, marketing, and video.",
+        },
+      ],
+    };
+  },
   component: ServicePage,
 });
 

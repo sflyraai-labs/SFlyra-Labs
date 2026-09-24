@@ -73,38 +73,56 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Sora:wght@300;400;500;600;700&display=swap",
-      },
-    ],
-    scripts: [
-      {
-        children: `(function(){try{var s=localStorage.getItem("sflyra-theme");var d=s? s==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;window.__sflyraTheme=d?"dark":"light";if(d)document.documentElement.classList.add("dark");}catch(e){}})();`,
-      },
-    ],
-  }),
+  head: () => {
+    const gaId =
+      typeof import.meta !== "undefined"
+        ? (import.meta.env?.["VITE_GA_ID"] as string | undefined)
+        : undefined;
+    const themeScript = `(function(){try{var s=localStorage.getItem("sflyra-theme");var d=s? s==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;window.__sflyraTheme=d?"dark":"light";if(d)document.documentElement.classList.add("dark");}catch(e){}})();`;
+    return {
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: "Lovable App" },
+        { name: "description", content: "Lovable Generated Project" },
+        { name: "author", content: "Lovable" },
+        { property: "og:title", content: "Lovable App" },
+        { property: "og:description", content: "Lovable Generated Project" },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:site", content: "@Lovable" },
+      ],
+      links: [
+        {
+          rel: "stylesheet",
+          href: appCss,
+        },
+        { rel: "icon", href: "/favicon.png", type: "image/png" },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Sora:wght@300;400;500;600;700&display=swap",
+        },
+      ],
+      scripts: [
+        { children: themeScript },
+        ...(gaId
+          ? [
+              {
+                src: `https://www.googletagmanager.com/gtag/js?id=${gaId}`,
+                async: true,
+              },
+              {
+                children:
+                  `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}` +
+                  `gtag('js',new Date());gtag('config','${gaId}');`,
+              },
+            ]
+          : []),
+      ],
+    };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

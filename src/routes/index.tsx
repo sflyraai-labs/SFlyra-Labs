@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -9,7 +9,7 @@ import {
   Facebook,
   Instagram,
   Mail,
-  MessageSquare,
+  MessageCircle,
   Moon,
   Send,
   Sparkle,
@@ -17,13 +17,20 @@ import {
   User,
   Workflow,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { animate, motion, useInView } from "framer-motion";
 
 import logoPhoto from "@/assets/sflyra-logo.jpg";
 import fatimahPhoto from "@/assets/fatimah.jpg";
 import sumiyaPhoto from "@/assets/sumi.jpg";
 import { Sparkles, SparkleBurst } from "@/components/site/Sparkles";
-import { ChatActionLink } from "@/components/site/site-ui";
+import {
+  ChatActionLink,
+  NewsletterForm,
+  SiteFooter,
+  WhatsAppIcon,
+  whatsappHref,
+} from "@/components/site/site-ui";
+import { FloatingChatWidget } from "@/components/site/floating-chat";
 import { DemoVideo } from "@/components/site/demo-video";
 import { PRODUCTS, SERVICES } from "@/lib/catalog";
 import {
@@ -386,7 +393,55 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
 
 /* Services & Products data moved to src/lib/catalog.tsx */
 
-const STATS = ["5 services", "1 team", "4-step process", "SFlyra — our own product"];
+const STATS = [
+  { value: 5, suffix: "", label: "services" },
+  { value: 1, suffix: "", label: "team" },
+  { value: 4, suffix: "-step", label: "process" },
+  { value: 0, suffix: "", label: "SFlyra — our own product" },
+];
+
+function StatCounter({
+  value,
+  suffix,
+  label,
+  delay,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  delay: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!inView || value <= 0) return;
+    const controls = animate(0, value, {
+      duration: 1.4,
+      delay,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [inView, value, delay]);
+
+  return (
+    <span ref={ref} className="text-sm text-muted-foreground">
+      {value > 0 ? (
+        <>
+          <span className="text-foreground">
+            {display}
+            {suffix}
+          </span>{" "}
+          {label}
+        </>
+      ) : (
+        <span className="text-foreground">{label}</span>
+      )}
+    </span>
+  );
+}
 
 function serviceSpan(i: number) {
   if (i === 0 || i === 3) return "lg:col-span-2";
@@ -436,6 +491,69 @@ const FAQ = [
   {
     q: "Do I need any technical knowledge?",
     a: "None at all. We handle setup, training and integration end-to-end, then hand you a simple dashboard so you can monitor and manage your AI workforce with ease.",
+  },
+];
+
+const PRICING = [
+  {
+    name: "Starter",
+    price: "$490",
+    priceNote: "project, from",
+    desc: "One focused build for businesses taking their first step with AI.",
+    features: [
+      "1 ready-made AI tool",
+      "Website or DM integration",
+      "Training on your business",
+      "30 days of support",
+    ],
+    highlight: false,
+  },
+  {
+    name: "Growth",
+    price: "$1,490",
+    priceNote: "project, from",
+    desc: "A full automation setup that streamlines how leads and content move.",
+    features: [
+      "2–3 connected AI agents",
+      "Custom workflows & integrations",
+      "AI-assisted content system",
+      "60 days of support + tuning",
+    ],
+    highlight: true,
+  },
+  {
+    name: "Custom",
+    price: "Let's talk",
+    priceNote: "scoped to you",
+    desc: "Bespoke agentic systems built for your exact workflows and data.",
+    features: [
+      "Dedicated AI employee/s",
+      "CRM & tool integration",
+      "Brand-tuned voice & processes",
+      "Ongoing training & maintenance",
+    ],
+    highlight: false,
+  },
+];
+
+const BLOG_POSTS = [
+  {
+    tag: "AI Agents",
+    title: "What an AI employee actually does all day",
+    excerpt:
+      "A practical look at the tasks agents handle end-to-end — from first reply to closed deal — and where humans still win.",
+  },
+  {
+    tag: "Automation",
+    title: "From enquiry to follow-up: automating your pipeline",
+    excerpt:
+      "The playbook we use for triggered emails, WhatsApp sequences and reminders that keep every lead warm.",
+  },
+  {
+    tag: "Product",
+    title: "SFlyra: the story behind our ready-made agents",
+    excerpt:
+      "Why we built our own product line instead of just selling services — and what it means for your launch speed.",
   },
 ];
 
@@ -522,15 +640,19 @@ function Index() {
           <Reveal className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-5 py-6 text-center lg:grid-cols-4 lg:px-8">
             {STATS.map((s, i) => (
               <motion.p
-                key={s}
+                key={s.label}
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-70px" }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: i * 0.08 }}
                 className="text-sm text-muted-foreground"
               >
-                <span className="text-foreground">{s.split(" ")[0]}</span>{" "}
-                {s.split(" ").slice(1).join(" ")}
+                <StatCounter
+                  value={s.value}
+                  suffix={s.suffix}
+                  label={s.label}
+                  delay={0.35 + i * 0.12}
+                />
               </motion.p>
             ))}
           </Reveal>
@@ -768,6 +890,43 @@ function Index() {
           </div>
         </section>
 
+        {/* Insights — fresh thinking from the SFlyra team */}
+        <section id="insights" className="scroll-mt-24 border-y border-border/60 bg-card/20">
+          <div className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
+            <Reveal>
+              <div className="flex flex-wrap items-end justify-between gap-6">
+                <SectionTitle eyebrow="Insights" title="Notes from the lab." />
+                <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+                  Practical ideas on AI, automation and marketing — written by the people who ship
+                  it every day.
+                </p>
+              </div>
+            </Reveal>
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
+              {BLOG_POSTS.map((post, i) => (
+                <Reveal key={post.title} delay={i * 0.1}>
+                  <article className="glass-panel flex h-full flex-col p-8 transition-all duration-300 hover:-translate-y-1 glow-soft hover:glow-strong">
+                    <span className="text-[10px] font-semibold tracking-[0.25em] text-primary uppercase">
+                      {post.tag}
+                    </span>
+                    <h3 className="mt-4 font-display text-xl leading-snug font-semibold">
+                      {post.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                      {post.excerpt}
+                    </p>
+                    <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-xs font-semibold text-primary">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-[11px] font-medium text-highlight">
+                        Coming soon
+                      </span>
+                    </span>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Statement */}
         <section className="border-y border-border/60">
           <Reveal>
@@ -778,6 +937,64 @@ function Index() {
               </p>
             </div>
           </Reveal>
+        </section>
+
+        {/* Pricing */}
+        <section id="pricing" className="scroll-mt-24 border-y border-border/60 bg-card/40">
+          <div className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
+            <Reveal>
+              <SectionTitle eyebrow="Pricing" title="Honest pricing, no surprises." />
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:items-stretch">
+                {PRICING.map((tier) => (
+                  <div
+                    key={tier.name}
+                    className={`relative flex h-full flex-col rounded-3xl p-8 transition-transform duration-300 hover:-translate-y-1 ${
+                      tier.highlight
+                        ? "border border-primary/50 bg-[image:var(--gradient-panel)] shadow-xl shadow-primary/10 glow-soft"
+                        : "glass-panel glow-soft hover:glow-strong"
+                    }`}
+                  >
+                    {tier.highlight && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[image:var(--gradient-primary)] px-3.5 py-1 text-[10px] font-bold tracking-wider text-primary-foreground uppercase">
+                        Most popular
+                      </span>
+                    )}
+                    <p className="text-[11px] font-semibold tracking-[0.25em] text-primary uppercase">
+                      {tier.name}
+                    </p>
+                    <p className="mt-4 font-display text-4xl font-bold tracking-tight">
+                      {tier.price}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{tier.priceNote}</p>
+                    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                      {tier.desc}
+                    </p>
+                    <ul className="mt-6 flex flex-1 flex-col gap-3">
+                      {tier.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2.5 text-sm">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <a
+                      href="#contact"
+                      className={`group relative mt-8 inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 ${
+                        tier.highlight
+                          ? "bg-[image:var(--gradient-primary)] text-primary-foreground"
+                          : "border border-primary/40 text-foreground hover:bg-primary/10"
+                      }`}
+                    >
+                      Get a quote
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </div>
         </section>
 
         {/* Contact */}
@@ -879,7 +1096,7 @@ function Index() {
                         Project details
                       </label>
                       <div className="relative">
-                        <MessageSquare className="pointer-events-none absolute top-4 left-4 h-4 w-4 text-muted-foreground/60" />
+                        <MessageCircle className="pointer-events-none absolute top-4 left-4 h-4 w-4 text-muted-foreground/60" />
                         <textarea
                           id="cf-message"
                           name="message"
@@ -979,6 +1196,24 @@ function Index() {
                   </div>
                 </a>
 
+                {/* WhatsApp */}
+                <a
+                  href={whatsappHref("Hi SFlyra Labs! I'd like to discuss a project.")}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group glass-panel flex items-center gap-4 rounded-3xl p-5 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-600 transition-colors group-hover:bg-emerald-500 group-hover:text-white sm:text-emerald-500 dark:text-emerald-300">
+                    <WhatsAppIcon className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      WhatsApp
+                    </p>
+                    <p className="mt-0.5 truncate text-sm font-medium">Chat instantly</p>
+                  </div>
+                </a>
+
                 {/* Response time */}
                 <div className="glass-panel rounded-3xl p-6">
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
@@ -1023,12 +1258,10 @@ function Index() {
         </section>
       </main>
 
-      <footer className="border-t border-border/60">
-        <div className="mx-auto grid max-w-7xl gap-4 px-5 py-10 text-sm text-muted-foreground lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:px-8">
-          <Wordmark />
-          <p>© {new Date().getFullYear()} SFlyra Labs. Building Intelligence. Fusing Ideas.</p>
-        </div>
-      </footer>
+      <SiteFooter />
+
+      {/* Floating home-page chat launcher */}
+      <FloatingChatWidget />
     </div>
   );
 }

@@ -3,12 +3,17 @@ import type { ReactNode } from "react";
 import {
   ArrowRight,
   Bot,
+  Facebook,
+  Instagram,
+  Mail,
+  MessageCircle,
   Minus,
   Monitor,
   Moon,
   Pause,
   Play,
   Plus,
+  Send,
   Smartphone,
   Sun,
 } from "lucide-react";
@@ -18,6 +23,100 @@ import { motion } from "framer-motion";
 import logoPhoto from "@/assets/sflyra-logo.jpg";
 import type { DemoKind } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
+
+/**
+ * WhatsApp contact number (international format, no "+" or spaces).
+ *
+ * TODO: Swap this placeholder for the real SFlyra number once it's shared —
+ * the buttons across the footer and contact section update automatically.
+ */
+export const WHATSAPP_NUMBER = "923XXXXXXXXX";
+
+export function whatsappHref(message?: string) {
+  const base = `https://wa.me/${WHATSAPP_NUMBER}`;
+  return message ? `${base}?text=${encodeURIComponent(message)}` : base;
+}
+
+/** Brand WhatsApp glyph (not in lucide). */
+export function WhatsAppIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  );
+}
+
+/** Newsletter subscribe box — posts to the same FormSubmit inbox as the contact form. */
+export function NewsletterForm({ compact = false }: { compact?: boolean }) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setStatus("sending");
+    try {
+      const res = await fetch("https://formsubmit.co/ajax/sflyraai@gmail.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          email,
+          _subject: "SFlyra newsletter subscription",
+          _template: "table",
+        }),
+      });
+      if (!res.ok) throw new Error(`FormSubmit responded with ${res.status}`);
+      setStatus("sent");
+      setEmail("");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  if (status === "sent") {
+    return (
+      <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-medium text-emerald-600 sm:text-sm dark:text-emerald-300">
+        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-500/20">
+          <Send className="h-3 w-3" />
+        </span>
+        You&apos;re in! We&apos;ll share launches &amp; early access.
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="flex w-full items-center gap-2">
+      <div className="relative min-w-0 flex-1">
+        <Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          aria-label="Email address"
+          className="w-full rounded-full border border-border bg-card/60 py-2.5 pr-4 pl-9 text-sm text-foreground placeholder:text-muted-foreground/70 transition-all duration-200 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/15"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className={`relative inline-flex shrink-0 items-center gap-1.5 overflow-hidden rounded-full bg-[image:var(--gradient-primary)] px-4 py-2.5 text-xs font-semibold text-primary-foreground transition-all duration-300 hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-70 ${
+          compact ? "sm:px-4" : "sm:px-5"
+        }`}
+      >
+        {status === "sending" ? (
+          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground" />
+        ) : (
+          <>
+            Subscribe
+            {!compact && <Send className="-ml-1 h-3.5 w-3.5" />}
+          </>
+        )}
+      </button>
+    </form>
+  );
+}
 
 export const NAV = [
   { label: "Services", href: "#services" },
@@ -332,9 +431,116 @@ export function PageBar() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/60">
-      <div className="mx-auto grid max-w-7xl gap-4 px-5 py-10 text-sm text-muted-foreground lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:px-8">
-        <Wordmark href="/" />
-        <p>© {new Date().getFullYear()} SFlyra Labs. Building Intelligence. Fusing Ideas.</p>
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid gap-10 py-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] md:gap-8">
+          {/* Brand */}
+          <div>
+            <Wordmark href="/" />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              A premium digital agency for web development, AI automation and agentic workflows —
+              and the makers of SFlyra.
+            </p>
+          </div>
+
+          {/* Company links */}
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+              Explore
+            </p>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              <li>
+                <Link
+                  to="/"
+                  hash="services"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  hash="product"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  SFlyra
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  hash="team"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Team
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  hash="contact"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Newsletter + socials */}
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+              AI insights, monthly
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Product updates and automation ideas — no spam, ever.
+            </p>
+            <div className="mt-4 max-w-sm">
+              <NewsletterForm />
+            </div>
+            <div className="mt-6 flex items-center gap-2.5">
+              <a
+                href="https://www.instagram.com/sflyra_labs/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="SFlyra Labs on Instagram"
+                className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.facebook.com/profile.php?id=61594396690562"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="SFlyra Labs on Facebook"
+                className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a
+                href={whatsappHref("Hi SFlyra Labs!")}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Chat with SFlyra Labs on WhatsApp"
+                className="grid h-9 w-9 place-items-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 transition-colors hover:bg-emerald-500/20 sm:text-emerald-500 dark:text-emerald-300"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="mailto:sflyraai@gmail.com"
+                aria-label="Email SFlyra Labs"
+                className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+              >
+                <Mail className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 border-t border-border/60 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} SFlyra Labs. Building Intelligence. Fusing Ideas.</p>
+          <p>Made with intent in Pakistan.</p>
+        </div>
       </div>
     </footer>
   );
@@ -514,21 +720,14 @@ export function DemoPanel({ kind }: { kind: DemoKind }) {
                 ["Booked", "booked"],
               ] as const
             ).map(([label, key]) => (
-              <div
-                key={key}
-                className="rounded-xl border border-border/80 bg-card p-4 text-center"
-              >
-                <p className="font-display text-3xl font-bold text-primary">
-                  {metrics[key]}
-                </p>
+              <div key={key} className="rounded-xl border border-border/80 bg-card p-4 text-center">
+                <p className="font-display text-3xl font-bold text-primary">{metrics[key]}</p>
                 <p className="mt-1 text-[11px] font-semibold text-muted-foreground uppercase">
                   {label}
                 </p>
                 <div className="mt-2 flex justify-center gap-1">
                   <button
-                    onClick={() =>
-                      setMetrics((m) => ({ ...m, [key]: Math.max(0, m[key] - 1) }))
-                    }
+                    onClick={() => setMetrics((m) => ({ ...m, [key]: Math.max(0, m[key] - 1) }))}
                     className="grid h-6 w-6 place-items-center rounded-md border border-border text-muted-foreground transition hover:border-primary/50 hover:text-primary"
                   >
                     <Minus className="h-3 w-3" />
@@ -621,9 +820,7 @@ export function DemoPanel({ kind }: { kind: DemoKind }) {
               ).map(([label, key]) => (
                 <button
                   key={key}
-                  onClick={() =>
-                    setToggles((t) => ({ ...t, [key]: !t[key] }))
-                  }
+                  onClick={() => setToggles((t) => ({ ...t, [key]: !t[key] }))}
                   className="flex w-full items-center justify-between rounded-xl border border-border/80 bg-card px-4 py-3 text-left transition hover:border-primary/40"
                 >
                   <span className="text-sm font-semibold">{label}</span>

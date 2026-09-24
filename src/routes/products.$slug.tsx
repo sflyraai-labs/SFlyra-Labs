@@ -15,16 +15,24 @@ import { AgentChatPanel } from "@/components/site/agent-chat";
 import { PRODUCTS, findProduct } from "@/lib/catalog";
 
 export const Route = createFileRoute("/products/$slug")({
-  head: () => ({
-    meta: [
-      { title: "SFlyra products — SFlyra Labs" },
-      {
-        name: "description",
-        content:
-          "Showcase pages for SFlyra — ready-to-deploy AI tools and custom agents built by SFlyra Labs.",
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const product = findProduct(params.slug);
+    return {
+      meta: [
+        {
+          title: product
+            ? `${product.title} — SFlyra products | SFlyra Labs`
+            : "SFlyra products — SFlyra Labs",
+        },
+        {
+          name: "description",
+          content: product
+            ? `${product.title} by SFlyra Labs. ${product.long}`
+            : "Showcase pages for SFlyra — ready-to-deploy AI tools and custom agents built by SFlyra Labs.",
+        },
+      ],
+    };
+  },
   component: ProductPage,
 });
 
@@ -113,8 +121,8 @@ function ProductPage() {
               <div className="mt-4 flex items-center justify-between gap-3">
                 <p className="text-xs text-muted-foreground">
                   Chatting with the real{" "}
-                  <span className="font-semibold text-foreground">{product.title}</span> agent
-                  — ask about setup, workflows, or pricing.
+                  <span className="font-semibold text-foreground">{product.title}</span> agent — ask
+                  about setup, workflows, or pricing.
                 </p>
               </div>
             </div>
