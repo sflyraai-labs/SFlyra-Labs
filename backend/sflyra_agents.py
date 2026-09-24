@@ -369,9 +369,13 @@ def _concierge_agent(model) -> Agent:
             "- Video Editing — reels, ads and polished short-form cuts. [details](https://sflyra.site/services/video-editing#agent-chat)\n\n"
             "HOW TO RESPOND:\n"
             '1) If the user asks what SFlyra offers — "services", "products" or "what do you do" '
-            "— give a friendly COMPLETE overview: all 6 products and all 5 services in one short "
-            "line each, and mention that every offering has a dedicated agent they can switch to "
-            "from the selector at the top of this chat panel.\n"
+            "— give a COMPLETE overview: all 6 products and all 5 services, ONE short line each, "
+            "and for EVERY offering include a clickable routing link as a Markdown link "
+            "(e.g. [AI Chatbot](https://sflyra.site/products/ai-chatbot#agent-chat), "
+            "[Web Development](https://sflyra.site/services/web-development#agent-chat)). "
+            "Mention that every offering has a dedicated agent they can switch to from the "
+            "selector at the top of this chat panel. NEVER use Markdown bold (\"**\") or "
+            "headings (\"###\") — this chat only renders plain text and Markdown links.\n"
             "2) If the user asks about META or asks for DETAILS of one specific product or service, "
             "give a short 2-3 sentence overview, then HAND OFF with both: (a) tell them to switch to "
             'the dedicated "<Name>" agent using the selector at the top of this chat panel, and (b) '
@@ -536,6 +540,92 @@ def _concierge_handoff(query: str) -> str | None:
                 f"Want me to explain a bit more about {title} first?"
             )
     return None
+
+
+# One-line descriptions used in the deterministic "what do you offer" overview.
+# (title, kind (products|services), slug, one-line description)
+_OFFERINGS_LINES: tuple[tuple[str, str, str, str], ...] = (
+    (
+        "AI Chatbot", "products", "ai-chatbot",
+        "automatic responses and lead capture on your website or Instagram DMs",
+    ),
+    (
+        "Email/WhatsApp Automation", "products", "email-whatsapp-automation",
+        "auto-replies, order confirmations and follow-up sequences",
+    ),
+    (
+        "Social Media Auto-Poster", "products", "social-media-auto-poster",
+        "schedule posts and auto-generate captions for Instagram, Facebook and LinkedIn",
+    ),
+    (
+        "AI Content Writer", "products", "ai-content-writer",
+        "blogs, captions and product descriptions in seconds",
+    ),
+    (
+        "AI Automation", "products", "ai-automation",
+        "custom AI that runs your back-office workflows on autopilot",
+    ),
+    (
+        "Agentic Workflows", "products", "agentic-workflows",
+        "multi-step agents that research, decide and act across your tools",
+    ),
+    (
+        "Web Development", "services", "web-development",
+        "fast, SEO-ready websites and stores, optionally with an AI chat assistant",
+    ),
+    (
+        "Graphic Designing", "services", "graphic-designing",
+        "logos, full brand kits and social media creatives",
+    ),
+    (
+        "Digital Marketing", "services", "digital-marketing",
+        "social growth, content calendars and paid campaigns",
+    ),
+    (
+        "Video Animation", "services", "video-animation",
+        "explainer videos and motion graphics for your brand",
+    ),
+    (
+        "Video Editing", "services", "video-editing",
+        "polished reels, ads and short-form cuts",
+    ),
+)
+
+_OVERVIEW_INTENT = (
+    "what do you offer", "what do you do", "what services", "what products",
+    "services and products", "products and services", "your services", "your products",
+    "all services", "all products", "list of services", "list of products", "offerings",
+    "catalogue", "catalog", "everything you offer", "what can you do", "what can you help",
+    "tell me about your services", "tell me about your products", "what are your services",
+    "what are your products", "what is sflyra", "what does sflyra do", "about sflyra",
+)
+
+
+def _concierge_overview(query: str) -> str | None:
+    """Deterministically answer the whole-catalog question with a clean list:
+    every product/service in ONE line plus its clickable routing link, so the
+    client immediately sees what SFlyra offers and where to go for details."""
+    q = query.lower()
+    if not any(p in q for p in _OVERVIEW_INTENT):
+        return None
+
+    def _block(items: list) -> str:
+        return "\n".join(
+            f"{i}. {title} — {desc}. [Chat with agent](https://sflyra.site/{kind}/{slug}#agent-chat)"
+            for i, (title, kind, slug, desc) in enumerate(items, 1)
+        )
+
+    products = _block([row for row in _OFFERINGS_LINES if row[1] == "products"])
+    services = _block([row for row in _OFFERINGS_LINES if row[1] == "services"])
+
+    return (
+        "Here's everything SFlyra Labs offers — each one has a dedicated agent you can "
+        "switch to from the selector at the top, and a page with its own live \"Chat with "
+        "agent\". Tap a link to go straight there:\n\n"
+        f"PRODUCTS:\n{products}\n\n"
+        f"SERVICES:\n{services}\n\n"
+        "Which one would you like details on? I'll dive in and route you to that specialist."
+    )
 
 
 # ---------------------------------------------------------------------------

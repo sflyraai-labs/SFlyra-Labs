@@ -35,6 +35,7 @@ from agents import Runner
 from sflyra_agents import (
     AGENT_NAMES,
     _concierge_handoff,
+    _concierge_overview,
     build_agent,
     get_provider_labels,
     get_providers,
@@ -218,15 +219,17 @@ async def _stream_agent(agent_id: str, messages):
 
     # Deterministic concierge routing: when the user clearly asks about a specific
     # SFlyra offering, stream the ready-made handoff (page link + live "Chat with
-    # agent" + direct contact links) instead of relying on the LLM to do it right.
+    # agent" + direct contact links); otherwise, if they ask for the whole catalog,
+    # stream the clean overview (one line + routing link per offering). Only when
+    # neither matches do we let the LLM answer.
     if agent_id == "sflyra-concierge":
         last_user = next(
             (m.content for m in reversed(messages) if m.role == "user" and m.content.strip()),
             "",
         )
-        handoff = _concierge_handoff(last_user)
-        if handoff:
-            yield _sse("delta", {"text": handoff})
+        reply = _concierge_handoff(last_user) or _concierge_overview(last_user)
+        if reply:
+            yield _sse("delta", {"text": reply})
             yield _sse("done", {"agent": AGENT_NAMES.get(agent_id, agent_id)})
             return
 
